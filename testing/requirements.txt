@@ -1,0 +1,8 @@
+langchain-google-genai 
+geopy 
+requests
+langchain
+langgraph
+IPython
+python-dotenv
+
