@@ -4,7 +4,7 @@
 
 **Team Members:**
 - Andrew Bahsoun
-- Sami Hammoud  
+- Sami Hammoud
 - Landon Kauer
 - Max Richter
 
