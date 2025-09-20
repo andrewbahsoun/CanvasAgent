@@ -1,34 +1,75 @@
-# Canvas Connector (Flask Starter)
+# CanvasAgent
+
+**for IEEE OC Computer Society AI Dev Hack 2025**
+
+**Team Members:**
+- Andrew Bahsoun
+- Sami Hammoud  
+- Landon Kauer
+- Max Richter
+
+---
+
+## Flask Canvas Connector API
 
 Minimal Flask gateway that:
 - Handles Canvas OAuth2 (start + callback)
-- Stores tokens server-side (session for hackathon)
-- Exposes `/api/ask` to accept a question from your Chrome extension and forwards
-  it to your team's backend **including the Canvas access token** (server→server).
+- Supports both Canvas and Google Drive tokens
+- Exposes `/api/ask` to accept questions from Chrome extension and forwards
+  them to your team's backend **including both access tokens** (server→server).
 
 ## Quickstart
+
 1) Create and fill `.env` from `.env.example`.
-2) Create venv & install deps:
+2) Create conda environment & install deps:
    ```bash
-   python -m venv .venv
-   source ./.venv/bin/activate   # Windows: .\.venv\Scripts\activate
+   conda create -n hackathon python=3.9
+   conda activate hackathon
    pip install -r requirements.txt
    ```
 3) Run:
    ```bash
    python app.py
    ```
-4) From your Chrome extension popup:
-   - Open `http://localhost:5001/auth/canvas/start` to connect Canvas
-   - POST to `http://localhost:5001/api/ask` with `{"question": "..."}`
+4) From your Chrome extension:
+   - POST to `http://localhost:5001/api/ask` with tokens and question
+
+## API Endpoints
+
+- `GET /api/health` - Health check
+- `POST /api/test` - Simple test (no auth required)
+- `POST /api/ask-test` - Test with simulated tokens
+- `POST /api/ask` - **Main endpoint** (requires tokens in request body)
+- `GET /auth/canvas/start` - Start Canvas OAuth flow
+- `GET /auth/canvas/callback` - Canvas OAuth callback
+
+## Request Format
+
+```json
+{
+  "question": "What are my assignments?",
+  "context": {"course": "CS101"},
+  "canvas_tokens": {
+    "access_token": "canvas_token_123",
+    "refresh_token": "canvas_refresh_123",
+    "expires_in": 3600
+  },
+  "google_tokens": {
+    "access_token": "google_token_456",
+    "refresh_token": "google_refresh_456", 
+    "expires_in": 3600
+  }
+}
+```
 
 ## Important ENV Vars
-- `ALLOWED_EXTENSION_ORIGIN`: set to your extension's origin in prod, e.g.
-  `chrome-extension://<YOUR_EXT_ID>`; for local web UIs you can use `http://localhost:5173`.
-- `CANVAS_*`: your Canvas developer key + base URL + redirect URI.
-- `BACKEND_URL` and `BACKEND_AUTH`: where to forward the question and token.
+
+- `ALLOWED_EXTENSION_ORIGIN`: set to your extension's origin in prod
+- `CANVAS_*`: your Canvas developer key + base URL + redirect URI
+- `BACKEND_URL` and `BACKEND_AUTH`: where to forward the question and tokens
 
 ## Security Notes
-- Do **not** return Canvas tokens to the extension.
-- Use HTTPS in production and keep `SameSite=None; Secure` cookie settings.
-- Lock CORS to your exact extension origin in production.
+
+- Tokens are never stored on the server (frontend manages them)
+- Use HTTPS in production
+- Lock CORS to your exact extension origin in production
